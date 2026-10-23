@@ -82,6 +82,9 @@ open class LoopPagingView: LoopCollectionView {
     }
     
     private func autoScrollToNextPage() {
+        guard self.collectionViewBoundsSize > 0, window != nil else {
+            return
+        }
         switch self.scrollDirection {
         case .vertical:
             let currentPage = round(self.collectionView.contentOffset.y / self.collectionViewBoundsSize)

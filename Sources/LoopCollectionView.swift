@@ -182,7 +182,7 @@ open class LoopCollectionView: UIView {
 
     @objc(dequeueReusableCellWithReuseIdentifier:forIndex:)
     open func dequeueReusableCell(withReuseIdentifier identifier: String, for index: Int) -> UICollectionViewCell {
-        let indexPath = IndexPath(item: index, section: 0)
+        let indexPath = IndexPath(item: boundaryIndex(forOriginalIndex: index), section: 0)
         return collectionView.dequeueReusableCell(withReuseIdentifier: identifier, for: indexPath)
     }
 
@@ -221,7 +221,7 @@ extension LoopCollectionView {
             return
         }
         if cellSize > 0 {
-            numberOfBoundaryElements = lround(collectionViewBoundsSize / cellSize)
+            numberOfBoundaryElements = max(1, Int(ceil(collectionViewBoundsSize / (cellSize + cellSpacing))))
         } else {
             numberOfBoundaryElements = 1
         }
@@ -271,14 +271,7 @@ extension LoopCollectionView {
     private func originalIndex(forBoundaryIndex index: Int) -> Int {
         guard numberOfItems > 0 else { return 0 }
         let difference = index - numberOfBoundaryElements
-        if difference < 0 {
-            let idx = numberOfItems + difference
-            return abs(idx % numberOfItems)
-        } else if difference < numberOfItems {
-            return difference
-        } else {
-            return abs((difference - numberOfItems) % numberOfItems)
-        }
+        return (difference % numberOfItems + numberOfItems) % numberOfItems
     }
 
     private func boundaryIndex(forOriginalIndex index: Int) -> Int {
